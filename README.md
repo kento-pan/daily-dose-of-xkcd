@@ -6,4 +6,4 @@ Made to be run daily from a server. Personally I use it with a cronjob on my Ras
 
 e.g. ```0 9 * * *``` https://crontab.guru/
 
-Add you mail creditentials in the ```config.py```.
+Add your mail creditentials in the ```config.py```.
