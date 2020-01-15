@@ -11,7 +11,6 @@ from email.mime.image import MIMEImage
 
 
 def get_image():
-
     # Finds and loads the image
     header = "xkcd"
     r = requests.get("https://c.xkcd.com/random/comic/", header)
@@ -20,27 +19,22 @@ def get_image():
     img = comic_div.find("img")
     img_url = img.get("src")
     fixed_img_url = "https:" + img_url
-    get_image.image_title = img.get("alt")
-    request_img = requests.get(fixed_img_url, header, stream="True")
-    get_image.png_title = get_image.image_title + ".png"
-    local_image = open(get_image.png_title, "wb")
-    request_img.raw.decode_content = True
-
-    # Saves image locally
-    shutil.copyfileobj(request_img.raw, local_image)
-    del request_img
+    get_image.filename = img.get("alt") + ".png"
+    with requests.get(fixed_img_url, header, stream="True") as r, open(get_image.filename, "wb") as fp:
+        r.raw.decode_content = True
+        shutil.copyfileobj(r.raw, fp)
 
 
 def send_mail():
 
     # Message config
     msgRoot = MIMEMultipart("related")
-    msgRoot["Subject"] = "Your daily xkcd dose - " + get_image.image_title
+    msgRoot["Subject"] = "Your daily xkcd dose - " + get_image.filename
     msgRoot["From"] = config.send_from
     msgRoot["To"] = config.send_to
 
     # Loads image to mail
-    fp = open(get_image.png_title, "rb")
+    fp = open(get_image.filename, "rb")
     msgImage = MIMEImage(fp.read())
     fp.close()
     msgImage.add_header("Content-ID", "<image1>")
